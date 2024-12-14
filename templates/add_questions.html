@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Add a New Quiz Question</h1>
+    <form method="POST" action="/add_questions">
+        <label for="question_text">Question Text:</label><br>
+        <textarea id="question_text" name="question_text" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="option_a">Option A:</label><br>
+        <input type="text" id="option_a" name="option_a" required><br><br>
+
+        <label for="option_b">Option B:</label><br>
+        <input type="text" id="option_b" name="option_b" required><br><br>
+
+        <label for="option_c">Option C:</label><br>
+        <input type="text" id="option_c" name="option_c" required><br><br>
+
+        <label for="option_d">Option D:</label><br>
+        <input type="text" id="option_d" name="option_d" required><br><br>
+
+        <label for="correct_option">Correct Option:</label><br>
+        <select id="correct_option" name="correct_option" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+        </select><br><br>
+
+        <button type="submit">Add Question</button>
+    </form>
+
+    <a href="/">Go to Home</a>
+</body>
+</html>
