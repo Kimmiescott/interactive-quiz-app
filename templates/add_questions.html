@@ -1,40 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Character set for the document -->
     <meta charset="UTF-8">
+
+    <!-- Viewport settings for responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title of the page that appears in the browser tab -->
     <title>Add Questions</title>
+
+    <!-- Linking external CSS file for styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body>
-    <h1>Add a New Quiz Question</h1>
-    <form method="POST" action="/add_questions">
-        <label for="question_text">Question Text:</label><br>
-        <textarea id="question_text" name="question_text" rows="4" cols="50" required></textarea><br><br>
+<body class="auth-page">
+    <!-- Main container for the add question form -->
+    <div class="auth-container add-question-container">
+        
+        <!-- Heading for the page -->
+        <h1>Add a New Quiz Question</h1>
 
-        <label for="option_a">Option A:</label><br>
-        <input type="text" id="option_a" name="option_a" required><br><br>
+        <!-- Form for submitting a new quiz question -->
+        <form method="POST" action="/add_questions">
+            
+            <!-- Form Group for the question text input -->
+            <div class="form-group">
+                <label for="question_text">Question Text:</label>
+                <textarea id="question_text" name="question_text" rows="4" placeholder="Enter your question here..." required></textarea>
+            </div>
 
-        <label for="option_b">Option B:</label><br>
-        <input type="text" id="option_b" name="option_b" required><br><br>
+            <!-- Form Group for the Option A input -->
+            <div class="form-group">
+                <label for="option_a">Option A:</label>
+                <input type="text" id="option_a" name="option_a" placeholder="Enter Option A" required>
+            </div>
 
-        <label for="option_c">Option C:</label><br>
-        <input type="text" id="option_c" name="option_c" required><br><br>
+            <!-- Form Group for the Option B input -->
+            <div class="form-group">
+                <label for="option_b">Option B:</label>
+                <input type="text" id="option_b" name="option_b" placeholder="Enter Option B" required>
+            </div>
 
-        <label for="option_d">Option D:</label><br>
-        <input type="text" id="option_d" name="option_d" required><br><br>
+            <!-- Form Group for the Option C input -->
+            <div class="form-group">
+                <label for="option_c">Option C:</label>
+                <input type="text" id="option_c" name="option_c" placeholder="Enter Option C" required>
+            </div>
 
-        <label for="correct_option">Correct Option:</label><br>
-        <select id="correct_option" name="correct_option" required>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-        </select><br><br>
+            <!-- Form Group for the Option D input -->
+            <div class="form-group">
+                <label for="option_d">Option D:</label>
+                <input type="text" id="option_d" name="option_d" placeholder="Enter Option D" required>
+            </div>
 
-        <button type="submit">Add Question</button>
-    </form>
+            <!-- Form Group for selecting the correct option -->
+            <div class="form-group">
+                <label for="correct_option">Correct Option:</label>
+                <select id="correct_option" name="correct_option" required>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>
 
-    <a href="/">Go to Home</a>
+            <!-- Submit button to add the question -->
+            <button type="submit" class="btn-primary">Add Question</button>
+        </form>
+
+        <!-- Link to go back to the home page -->
+        <a href="/" class="auth-link">Go to Home</a>
+    </div>
 </body>
 </html>

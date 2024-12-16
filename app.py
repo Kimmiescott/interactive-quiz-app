@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import time
 import datetime
+from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -72,6 +74,20 @@ def quiz():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    quiz_duration = timedelta(minutes=15)
+
+    questions = Question.query.all()
+
+    if request.method == 'GET':
+        if 'quiz_start_time' not in session:
+            session['quiz_start_time'] = time.time() 
+
+        elapsed_time = time.time() - session['quiz_start_time']
+        if elapsed_time > quiz_duration.total_seconds():
+            return redirect(url_for('results'))  
+
+        return render_template('quiz.html', questions=questions, quiz_duration=quiz_duration)
+
     if request.method == 'POST':
         user_id = session['user_id']
         score = 0
@@ -84,9 +100,6 @@ def quiz():
         db.session.add(new_result)
         db.session.commit()
         return redirect(url_for('results'))
-
-    questions = Question.query.all()
-    return render_template('quiz.html', questions=questions)
 
 @app.route('/results')
 def results():
@@ -137,5 +150,5 @@ def api_questions():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Ensure database tables are created
+        db.create_all() 
     app.run(debug=True)

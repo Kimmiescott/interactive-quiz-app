@@ -1,23 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Set character encoding to UTF-8 for correct text representation -->
     <meta charset="UTF-8">
+
+    <!-- Make the page responsive on different devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title of the page shown in the browser tab -->
     <title>Results</title>
+
+    <!-- Link to external CSS stylesheet for styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<nav>
-    <a href="{{ url_for('user_account', user_id=session['user_id']) }}">My Account</a> |
-    <a href="/logout">Logout</a>
-</nav>
-<body>
-    <h1>Your Quiz Results</h1>
-    <ul>
-        {% for result in results %}
-            <li>Date: {{ result.date_taken }} - Score: {{ result.score }}</li>
-        {% endfor %}
-    </ul>
-    <a href="/quiz">Take Another Quiz</a>
-    <a href="/logout" class="logout-button">Logout</a>
+<body class="auth-page">
+
+    <!-- Container for the results page content -->
+    <div class="auth-container">
+        <!-- Header for the results page -->
+        <h1>Your Quiz Results</h1>
+
+        <!-- Conditional display of results if available -->
+        {% if results %}
+            <!-- List to display each quiz result -->
+            <ul class="results-list">
+                {% for result in results %}
+                    <!-- List item for each quiz result -->
+                    <li>
+                        <!-- Display the date the quiz was taken -->
+                        <strong>Date:</strong> {{ result.date_taken }} 
+                        <!-- Display the score for the quiz result -->
+                        <span class="score"><strong>- Score:</strong> {{ result.score }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <!-- Message shown if there are no quiz results -->
+            <p>No results available yet.</p>
+        {% endif %}
+
+        <!-- Actions to either return home or logout -->
+        <div class="results-actions">
+            <!-- Button to return to the home page -->
+            <a href="/" class="btn-primary">Home</a>
+            <!-- Button to log out -->
+            <a href="/logout" class="btn-danger">Logout</a>
+        </div>
+    </div>
 </body>
 </html>

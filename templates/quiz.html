@@ -1,36 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Setting the character encoding for the document to UTF-8 -->
     <meta charset="UTF-8">
+
+    <!-- Ensures the page is responsive on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title of the page displayed on the browser tab -->
     <title>Quiz</title>
+
+    <!-- Link to external CSS file for styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- Script for the timer and auto-submit functionality -->
+    <script>
+        // Get the quiz start time and duration from Flask session and pass them to JS
+        const startTime = {{ session['quiz_start_time'] | tojson }};
+        const duration = {{ quiz_duration.total_seconds() | tojson }};
+        
+        // Function to update the timer and check if the time has run out
+        window.onload = function() {
+            const endTime = startTime + duration;
+
+            function updateTimer() {
+                const now = new Date().getTime() / 1000;  // Get current time in seconds
+                const timeLeft = endTime - now;
+
+                if (timeLeft <= 0) {
+                    // If time is up, submit the quiz form
+                    document.getElementById('quizForm').submit();
+                } else {
+                    // Update the timer display
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = Math.floor(timeLeft % 60);
+                    document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+            }
+
+            // Update the timer every second
+            setInterval(updateTimer, 1000);
+        };
+    </script>
 </head>
+
+<!-- Navigation Bar: Links to home, account, and logout -->
 <nav>
+    <a href="/">Home</a> |
     <a href="{{ url_for('user_account', user_id=session['user_id']) }}">My Account</a> |
     <a href="/logout">Logout</a>
 </nav>
+
 <body>
+    <!-- Quiz Container: This contains the entire quiz page -->
     <div class="quiz-container">
-        <h1>Quiz</h1>
-        <form method="POST" action="/quiz">
+
+        <!-- Timer Display: Shows the countdown timer for the quiz -->
+        <p id="timer" style="text-align: center; font-size: 1.5em; margin-bottom: 20px;"></p>
+
+        <!-- Main Header: Title of the quiz page -->
+        <h1 style="text-align: center;">Quiz</h1>
+
+        <!-- Quiz Form: This is the main form for submitting the quiz -->
+        <form method="POST" action="/quiz" id="quizForm">
+            
+            <!-- Loop through each question and display it with options -->
             {% for question in questions %}
-                <div class="quiz-question">
-                    <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
-                    <div class="quiz-options">
-                        {% for key, value in question.options.items() %}
-                            <label>
-                                <input type="radio" name="question_{{ question.id }}" value="{{ key }}" required>
-                                {{ key }}: {{ value }}
-                            </label><br>
-                        {% endfor %}
+            <div class="quiz-question">
+                <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
+                <div class="quiz-options">
+                    <!-- Loop through each option for the current question -->
+                    {% for key, value in question.options.items() %}
+                    <div class="option-item">
+                        <!-- Radio button for each option -->
+                        <input type="radio" name="question_{{ question.id }}" value="{{ key }}" required>
+                        <!-- Label for each option -->
+                        <label for="question_{{ question.id }}_{{ key }}">{{ key }}: {{ value }}</label>
                     </div>
+                    {% endfor %}
                 </div>
-                <hr>
+            </div>
+            <hr>
             {% endfor %}
-            <button type="submit">Submit</button>
+
+            <!-- Submit Button: Submit the quiz -->
+            <button type="submit" class="btn-primary">Submit</button>
         </form>
+        
     </div>
-    <a href="/logout" class="logout-button">Logout</a>
 </body>
 </html>

@@ -1,6 +1,5 @@
 from app import db, Question, app
 
-# Sample Questions
 questions = [
     {
         "question_text": "What is the capital of France?",
@@ -19,9 +18,8 @@ questions = [
     },
 ]
 
-# Insert Questions into the Database
-with app.app_context():  # Explicitly set the app context
-    db.create_all()  # Ensure tables exist
+with app.app_context():  
+    db.create_all() 
     for q in questions:
         question = Question(
             question_text=q["question_text"],

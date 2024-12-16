@@ -1,39 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Set the character encoding for the page -->
     <meta charset="UTF-8">
+
+    <!-- Make the page responsive for various devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Set the title of the page, which appears in the browser tab -->
     <title>User Account</title>
+
+    <!-- Link to the external CSS file to style the page -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body>
-    <h1>User Account</h1>
-    <h2>{{ user.username }}</h2>
-    
-    <h3>Quiz Scores:</h3>
-    {% if quizzes %}
-        <table border="1" cellpadding="10" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Quiz ID</th>
-                    <th>Score</th>
-                    <th>Date Taken</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for quiz in quizzes %}
-                    <tr>
-                        <td>{{ quiz.id }}</td>
-                        <td>{{ quiz.score }}</td>
-                        <td>{{ quiz.date_taken }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No quizzes taken yet.</p>
-    {% endif %}
-    
-    <a href="/">Back to Home</a>
+<body class="auth-page">
+    <!-- Container for the user account page content -->
+    <div class="auth-container">
+        <!-- Header displaying the title 'User Account' -->
+        <h1>User Account</h1>
+        
+        <!-- Display the username of the logged-in user -->
+        <h2>{{ user.username }}</h2>
+        
+        <!-- Subheading for quiz scores section -->
+        <h3>Quiz Scores:</h3>
+
+        <!-- Conditional block to display quiz scores if any quizzes exist -->
+        {% if quizzes %}
+            <!-- Table container to display quizzes and their scores -->
+            <div class="table-container">
+                <!-- Table displaying quiz results -->
+                <table>
+                    <thead>
+                        <tr>
+                            <!-- Table headers -->
+                            <th>Quiz ID</th>
+                            <th>Score</th>
+                            <th>Date Taken</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through each quiz and display it in the table -->
+                        {% for quiz in quizzes %}
+                            <tr>
+                                <!-- Display the quiz ID -->
+                                <td>{{ quiz.id }}</td>
+                                <!-- Display the score for the quiz -->
+                                <td>{{ quiz.score }}</td>
+                                <!-- Display the date when the quiz was taken -->
+                                <td>{{ quiz.date_taken }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Message displayed when no quizzes are taken yet -->
+            <p>No quizzes taken yet.</p>
+        {% endif %}
+        
+        <!-- Button to return to the home page -->
+        <a href="/" class="btn-secondary">Back to Home</a>
+    </div>
 </body>
 </html>
