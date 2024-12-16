@@ -1,4 +1,4 @@
-# **interactive-quiz-app**  
+# **Interactive-Quiz-App**  
 
 A web-based platform for creating and taking quizzes, with real-time scoring and performance tracking.
 
@@ -24,6 +24,7 @@ A web-based platform for creating and taking quizzes, with real-time scoring and
    `git clone https://github.com/yourusername/interactive-quiz-app.git`
 
 2. Navigate to the project directory:
+
    `cd interactive-quiz-app`
 
 3. Create and activate a virtual environment:
