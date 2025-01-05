@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import time
 import datetime
 from datetime import timedelta
+import os  # Added to read environment variables
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -20,7 +21,7 @@ class User(db.Model):
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_text = db.Column(db.String(500), nullable=False)
-    options = db.Column(db.JSON, nullable=False)  
+    options = db.Column(db.JSON, nullable=False)
     correct_option = db.Column(db.String(1), nullable=False)
 
 class QuizResult(db.Model):
@@ -67,7 +68,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    session.pop('quiz_start_time', None)  
+    session.pop('quiz_start_time', None)
     return redirect(url_for('home'))
 
 @app.route('/quiz', methods=['GET', 'POST'])
@@ -79,15 +80,12 @@ def quiz():
     questions = Question.query.all()
 
     if request.method == 'GET':
-        # Initialize quiz_start_time if not already set
         if 'quiz_start_time' not in session:
             session['quiz_start_time'] = time.time()
-        
-        # Calculate the remaining time
+
         elapsed_time = time.time() - session['quiz_start_time']
         remaining_time = max(quiz_duration.total_seconds() - elapsed_time, 0)
 
-        # Redirect to results if time is up
         if remaining_time <= 0:
             return redirect(url_for('results'))
 
@@ -101,19 +99,16 @@ def quiz():
             if selected_option == question.correct_option:
                 score += 1
 
-        # Save the results
         new_result = QuizResult(user_id=user_id, score=score)
         db.session.add(new_result)
         db.session.commit()
 
-        # Clear quiz session timer
         session.pop('quiz_start_time', None)
         return redirect(url_for('results'))
 
-
 @app.route('/results')
 def results():
-    timeout = request.args.get('timeout', False) 
+    timeout = request.args.get('timeout', False)
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
@@ -145,7 +140,6 @@ def add_questions():
 
     return render_template('add_questions.html')
 
-# REST API for quiz questions
 @app.route('/api/questions', methods=['GET'])
 def api_questions():
     questions = Question.query.all()
@@ -161,4 +155,7 @@ def api_questions():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+
+    # Use the PORT environment variable, or default to 5000
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
