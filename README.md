@@ -1,12 +1,12 @@
-# **Interactive-Quiz-App**  
+# **Series Quiz App**  
 
-A web-based platform for creating and taking quizzes, with real-time scoring and performance tracking.
+A web-based platform for creating and taking quizzes centered around popular TV and movie series, with real-time scoring and performance tracking.
 
 ## **Features**
 - **User Authentication**: Users can register, log in, and manage their accounts.
-- **Quizzes**: Multiple-choice questions with a scoring system.
+- **Series Quizzes**: Multiple-choice questions based on popular TV shows and movie series, with a scoring system.
 - **Quiz Results**: Track the performance of users over time.
-- **REST API**: Exposes quiz questions for external use.
+- **REST API**: Exposes quiz questions related to series for external use.
 - **Responsive UI**: The application works on both mobile and desktop browsers.
 
 ## **Technologies Used**

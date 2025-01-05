@@ -16,11 +16,11 @@ class User(db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     quizzes = db.relationship('QuizResult', backref='user', lazy=True)
-  
+
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_text = db.Column(db.String(500), nullable=False)
-    options = db.Column(db.JSON, nullable=False)  # {'A': 'Option1', 'B': 'Option2', ...}
+    options = db.Column(db.JSON, nullable=False)  
     correct_option = db.Column(db.String(1), nullable=False)
 
 class QuizResult(db.Model):
@@ -42,7 +42,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
@@ -59,7 +59,7 @@ def login():
 
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
-            return redirect(url_for('quiz'))
+            return redirect(url_for('home'))
         else:
             return 'Invalid username or password'
     return render_template('login.html')
@@ -67,6 +67,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
+    session.pop('quiz_start_time', None)  
     return redirect(url_for('home'))
 
 @app.route('/quiz', methods=['GET', 'POST'])
@@ -75,40 +76,49 @@ def quiz():
         return redirect(url_for('login'))
 
     quiz_duration = timedelta(minutes=15)
-
     questions = Question.query.all()
 
     if request.method == 'GET':
+        # Initialize quiz_start_time if not already set
         if 'quiz_start_time' not in session:
-            session['quiz_start_time'] = time.time() 
-
+            session['quiz_start_time'] = time.time()
+        
+        # Calculate the remaining time
         elapsed_time = time.time() - session['quiz_start_time']
-        if elapsed_time > quiz_duration.total_seconds():
-            return redirect(url_for('results'))  
+        remaining_time = max(quiz_duration.total_seconds() - elapsed_time, 0)
 
-        return render_template('quiz.html', questions=questions, quiz_duration=quiz_duration)
+        # Redirect to results if time is up
+        if remaining_time <= 0:
+            return redirect(url_for('results'))
+
+        return render_template('quiz.html', questions=questions, remaining_time=remaining_time)
 
     if request.method == 'POST':
         user_id = session['user_id']
         score = 0
-        for question in Question.query.all():
+        for question in questions:
             selected_option = request.form.get(f'question_{question.id}')
             if selected_option == question.correct_option:
                 score += 1
 
+        # Save the results
         new_result = QuizResult(user_id=user_id, score=score)
         db.session.add(new_result)
         db.session.commit()
+
+        # Clear quiz session timer
+        session.pop('quiz_start_time', None)
         return redirect(url_for('results'))
+
 
 @app.route('/results')
 def results():
-    if 'user_id' not in session:
+    timeout = request.args.get('timeout', False) 
+    user_id = session.get('user_id')
+    if not user_id:
         return redirect(url_for('login'))
-
-    user_id = session['user_id']
     results = QuizResult.query.filter_by(user_id=user_id).all()
-    return render_template('results.html', results=results)
+    return render_template('results.html', results=results, timeout=timeout)
 
 @app.route('/user/<int:user_id>', methods=['GET'])
 def user_account(user_id):
@@ -150,5 +160,5 @@ def api_questions():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all() 
+        db.create_all()
     app.run(debug=True)

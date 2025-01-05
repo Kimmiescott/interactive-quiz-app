@@ -10,83 +10,80 @@
     <!-- Title of the page displayed on the browser tab -->
     <title>Quiz</title>
 
-    <!-- Link to external CSS file for styling -->
+    <!-- Include external CSS for styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 
-    <!-- Script for the timer and auto-submit functionality -->
+    <!-- Timer Script -->
     <script>
-        // Get the quiz start time and duration from Flask session and pass them to JS
-        const startTime = {{ session['quiz_start_time'] | tojson }};
-        const duration = {{ quiz_duration.total_seconds() | tojson }};
-        
-        // Function to update the timer and check if the time has run out
-        window.onload = function() {
-            const endTime = startTime + duration;
+        const remainingTime = {{ remaining_time | tojson }};
+
+        window.onload = function () {
+            let timeLeft = remainingTime; // Initialize timer with remaining time from the server
 
             function updateTimer() {
-                const now = new Date().getTime() / 1000;  // Get current time in seconds
-                const timeLeft = endTime - now;
-
                 if (timeLeft <= 0) {
-                    // If time is up, submit the quiz form
-                    document.getElementById('quizForm').submit();
+                    document.getElementById('quizForm').submit(); // Submit quiz if time runs out
                 } else {
                     // Update the timer display
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = Math.floor(timeLeft % 60);
                     document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timeLeft--; // Decrement the timer
                 }
             }
 
             // Update the timer every second
+            updateTimer();
             setInterval(updateTimer, 1000);
         };
     </script>
 </head>
 
-<!-- Navigation Bar: Links to home, account, and logout -->
-<nav>
-    <a href="/">Home</a> |
-    <a href="{{ url_for('user_account', user_id=session['user_id']) }}">My Account</a> |
-    <a href="/logout">Logout</a>
-</nav>
-
 <body>
-    <!-- Quiz Container: This contains the entire quiz page -->
-    <div class="quiz-container">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Interactive Quiz</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('user_account', user_id=session['user_id']) }}">My Account</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Timer Display: Shows the countdown timer for the quiz -->
+    <!-- Quiz Container -->
+    <div class="quiz-container mt-5">
+        <!-- Timer -->
         <p id="timer" style="text-align: center; font-size: 1.5em; margin-bottom: 20px;"></p>
 
-        <!-- Main Header: Title of the quiz page -->
+        <!-- Quiz Title -->
         <h1 style="text-align: center;">Quiz</h1>
 
-        <!-- Quiz Form: This is the main form for submitting the quiz -->
+        <!-- Quiz Form -->
         <form method="POST" action="/quiz" id="quizForm">
-            
-            <!-- Loop through each question and display it with options -->
+            <!-- Loop through the questions -->
             {% for question in questions %}
-            <div class="quiz-question">
-                <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
-                <div class="quiz-options">
-                    <!-- Loop through each option for the current question -->
-                    {% for key, value in question.options.items() %}
-                    <div class="option-item">
-                        <!-- Radio button for each option -->
-                        <input type="radio" name="question_{{ question.id }}" value="{{ key }}" required>
-                        <!-- Label for each option -->
-                        <label for="question_{{ question.id }}_{{ key }}">{{ key }}: {{ value }}</label>
+                <div class="quiz-question">
+                    <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
+                    <div class="quiz-options">
+                        <!-- Loop through the options for each question -->
+                        {% for key, value in question.options.items() %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_{{ question.id }}_{{ key }}" value="{{ key }}" required>
+                                <label class="form-check-label" for="option_{{ question.id }}_{{ key }}">
+                                    {{ key }}: {{ value }}
+                                </label>
+                            </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            <hr>
+                <hr>
             {% endfor %}
 
-            <!-- Submit Button: Submit the quiz -->
-            <button type="submit" class="btn-primary">Submit</button>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
         </form>
-        
     </div>
 </body>
 </html>
